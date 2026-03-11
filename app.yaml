@@ -1,0 +1,27 @@
+command: ['python', 'app.py']
+
+authorization: user
+
+resources:
+  - name: agent-endpoint
+    serving_endpoint:
+      name: mas-3b6d93d7-endpoint
+      permission: CAN_QUERY
+
+env:
+  - name: 'DATABRICKS_HOST'
+    value: 'https://adb-4118603371332744.4.azuredatabricks.net/'
+  - name: 'AGENT_ENDPOINT_NAME'
+    value: 'mas-3b6d93d7-endpoint'
+  - name: 'UC_CATALOG'
+    value: 'collaboration'
+  - name: 'UC_SCHEMA'
+    value: 'discovery'
+  - name: 'UC_VOLUME_PATH'
+    value: '/Volumes/collaboration/discovery/inbound'
+  - name: 'TEMP_VOLUME_PATH'
+    value: '/Volumes/collaboration/discovery/temp'
+  - name: 'GENIE_SPACE_ID'
+    value: '01f117fab1581bd99662725f1a18a62b'
+  - name: 'KNOWLEDGE_ASSISTANT_ID'
+    value: '07d15c3f-983e-4510-b7fb-512c2ae89c28'

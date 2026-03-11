@@ -1,0 +1,40 @@
+# ============================================================================
+# Canada Life Knowledge Agent App - Configuration
+# ============================================================================
+# Update these values for each customer environment
+# ============================================================================
+
+# Knowledge Agent Configuration
+knowledge_agent:
+  # The serving endpoint name for the knowledge agent
+  # Find this in: Machine Learning → Serving → Serving Endpoints
+  # Format: ka-XXXXXXXX-endpoint
+  endpoint_name: "ka-973c2386-endpoint"
+
+# Unity Catalog Volume Configuration  
+unity_catalog:
+  # Full path to the UC volume for document storage
+  # Format: /Volumes/CATALOG/SCHEMA/VOLUME
+  # Example: /Volumes/main/documents/uploads
+  volume_path: "/Volumes/ronguerrero/canadalife/documents"
+
+# App Configuration (optional - usually don't need to change)
+app:
+  # App name (used in Databricks Apps)
+  name: "canada-life-ka-agent"
+  
+  # App description
+  description: "Knowledge Agent Chat Interface with Document Upload"
+  
+  # Port the app runs on (must be 8000 for Databricks Apps)
+  port: 8000
+
+# ============================================================================
+# How to Use This Config
+# ============================================================================
+# 
+# 1. Update the values above for your environment
+# 2. Run: python deploy.py
+#    OR manually update app.yaml with these values
+# 
+# ============================================================================

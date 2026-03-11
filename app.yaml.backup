@@ -1,0 +1,11 @@
+command: ['python', 'app.py']
+
+authorization: user
+
+env:
+  - name: 'DATABRICKS_HOST'
+    value: 'https://adb-7405618358516900.0.azuredatabricks.net'
+  - name: 'AGENT_ENDPOINT_NAME'
+    value: 'ka-8665bea3-endpoint'
+  - name: 'UC_VOLUME_PATH'
+    value: '/Volumes/ronguerrero/canadalife/documents'

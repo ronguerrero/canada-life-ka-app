@@ -1,0 +1,989 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Canada Life Knowledge Agent</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📚</text></svg>">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            height: 100vh;
+            display: flex;
+            overflow: hidden;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 320px;
+            background: #f8f9fa;
+            border-right: 1px solid #dee2e6;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .sidebar-header {
+            padding: 20px;
+            background: white;
+            border-bottom: 1px solid #dee2e6;
+        }
+
+        .sidebar-header h2 {
+            font-size: 16px;
+            color: #333;
+            margin-bottom: 12px;
+        }
+
+        .upload-section {
+            margin-top: 12px;
+        }
+
+        .upload-btn {
+            width: 100%;
+            padding: 10px;
+            background: #0066cc;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .upload-btn:hover {
+            background: #0052a3;
+        }
+
+        /* Menu Section */
+        .menu-section {
+            padding: 16px;
+            border-bottom: 1px solid #dee2e6;
+        }
+
+        .menu-item {
+            background: white;
+            border: 1px solid #dee2e6;
+            border-radius: 6px;
+            margin-bottom: 8px;
+            overflow: hidden;
+        }
+
+        .menu-header {
+            padding: 12px 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .menu-header:hover {
+            background: #f8f9fa;
+        }
+
+        .menu-title {
+            font-size: 14px;
+            font-weight: 500;
+            color: #333;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .menu-icon {
+            font-size: 16px;
+        }
+
+        .menu-badge {
+            background: #e3f2fd;
+            color: #1976d2;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+            margin-left: 8px;
+        }
+
+        .menu-badge.success {
+            background: #e8f5e9;
+            color: #2e7d32;
+        }
+
+        .menu-badge.warning {
+            background: #fff3e0;
+            color: #f57c00;
+        }
+
+        .expand-icon {
+            font-size: 12px;
+            transition: transform 0.2s;
+            color: #666;
+        }
+
+        .menu-item.expanded .expand-icon {
+            transform: rotate(90deg);
+        }
+
+        .menu-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out;
+        }
+
+        .menu-item.expanded .menu-content {
+            max-height: 1000px;
+        }
+
+        .submenu-section {
+            padding: 12px 16px;
+            border-top: 1px solid #dee2e6;
+        }
+
+        .submenu-title {
+            font-size: 11px;
+            font-weight: 600;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+        }
+
+        .file-item {
+            background: #f8f9fa;
+            border: 1px solid #e0e0e0;
+            border-radius: 4px;
+            padding: 8px;
+            margin-bottom: 6px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.2s;
+        }
+
+        .file-item:hover {
+            border-color: #0066cc;
+            background: white;
+        }
+
+        .file-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .file-name {
+            font-size: 12px;
+            font-weight: 500;
+            color: #333;
+            margin-bottom: 2px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .file-meta {
+            font-size: 10px;
+            color: #666;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 1px 5px;
+            border-radius: 3px;
+            font-size: 9px;
+            font-weight: 600;
+            margin-left: 4px;
+        }
+
+        .badge-table {
+            background: #e3f2fd;
+            color: #1976d2;
+        }
+
+        .badge-doc {
+            background: #f3e5f5;
+            color: #7b1fa2;
+        }
+
+        .delete-btn {
+            background: #dc3545;
+            color: white;
+            border: none;
+            padding: 4px 10px;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 10px;
+            font-weight: 500;
+            white-space: nowrap;
+        }
+
+        .delete-btn:hover {
+            background: #c82333;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 16px;
+            color: #999;
+            font-size: 11px;
+        }
+
+        .sync-button {
+            width: 100%;
+            padding: 8px;
+            background: #28a745;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 500;
+            margin-top: 8px;
+        }
+
+        .sync-button:hover {
+            background: #218838;
+        }
+
+        .sync-button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: white;
+        }
+
+        .chat-header {
+            padding: 20px;
+            border-bottom: 1px solid #dee2e6;
+            background: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .chat-header h1 {
+            font-size: 20px;
+            color: #333;
+            margin: 0;
+        }
+
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            background: #f8f9fa;
+        }
+
+        .message {
+            margin-bottom: 16px;
+            padding: 12px 16px;
+            border-radius: 8px;
+            max-width: 80%;
+            line-height: 1.6;
+        }
+
+        .message.user {
+            background: #0066cc;
+            color: white;
+            margin-left: auto;
+        }
+
+        .message.assistant {
+            background: white;
+            border: 1px solid #dee2e6;
+        }
+
+        /* Improved text formatting inside messages */
+        .message p {
+            margin: 0 0 12px 0;
+        }
+
+        .message p:last-child {
+            margin-bottom: 0;
+        }
+
+        .message ul, .message ol {
+            margin: 8px 0 12px 0;
+            padding-left: 24px;
+        }
+
+        .message li {
+            margin-bottom: 4px;
+        }
+
+        .message pre {
+            background: #f5f5f5;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 8px;
+            margin: 8px 0;
+            overflow-x: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+        }
+
+        .message code {
+            background: #f5f5f5;
+            border: 1px solid #ddd;
+            border-radius: 3px;
+            padding: 2px 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+        }
+
+        .message pre code {
+            background: none;
+            border: none;
+            padding: 0;
+        }
+
+        .message a {
+            color: #0066cc;
+            text-decoration: none;
+            border-bottom: 1px solid #0066cc;
+        }
+
+        .message a:hover {
+            color: #004494;
+            border-bottom-color: #004494;
+        }
+
+        .message sup a {
+            font-size: 11px;
+            border-bottom: none;
+            margin-left: 2px;
+        }
+
+        .message strong {
+            font-weight: 600;
+        }
+
+        .message em {
+            font-style: italic;
+        }
+
+        .chat-input-area {
+            padding: 20px;
+            border-top: 1px solid #dee2e6;
+            background: white;
+        }
+
+        .chat-input-container {
+            display: flex;
+            gap: 12px;
+        }
+
+        .chat-input {
+            flex: 1;
+            padding: 12px;
+            border: 1px solid #dee2e6;
+            border-radius: 6px;
+            font-size: 14px;
+            font-family: inherit;
+            resize: none;
+        }
+
+        .send-btn {
+            padding: 12px 24px;
+            background: #0066cc;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .send-btn:hover {
+            background: #0052a3;
+        }
+
+        .send-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+
+        .error-banner {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 12px 16px;
+            border-radius: 6px;
+            margin-bottom: 12px;
+            font-size: 13px;
+        }
+
+        .success-banner {
+            background: #d4edda;
+            color: #155724;
+            padding: 12px 16px;
+            border-radius: 6px;
+            margin-bottom: 12px;
+            font-size: 13px;
+        }
+        /* Thinking indicator animation */
+        .thinking-dots {
+            display: inline-block;
+            margin-left: 5px;
+        }
+
+        .thinking-dots .dot {
+            animation: thinking 1.4s infinite;
+            animation-fill-mode: both;
+            display: inline-block;
+            font-size: 12px;
+        }
+
+        .thinking-dots .dot:nth-child(1) {
+            animation-delay: 0s;
+        }
+
+        .thinking-dots .dot:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .thinking-dots .dot:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+
+        @keyframes thinking {
+            0%, 80%, 100% {
+                opacity: 0.3;
+                transform: scale(0.8);
+            }
+            40% {
+                opacity: 1;
+                transform: scale(1.2);
+            }
+        }
+
+        .message.thinking {
+            background: #e3f2fd;
+            border-left: 3px solid #2196f3;
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <h2>📚 Canada Life Knowledge Agent</h2>
+            <div class="upload-section">
+                <input type="file" id="fileInput" style="display: none" accept=".pdf,.docx,.xlsx,.csv,.txt,.pptx">
+                <button class="upload-btn" onclick="document.getElementById('fileInput').click()">
+                    📤 Upload File
+                </button>
+            </div>
+        </div>
+
+        <div class="menu-section">
+            <div id="errorContainer"></div>
+
+            <!-- Sync Status Menu Item (Collapsible) -->
+            <div class="menu-item" id="syncStatusMenu">
+                <div class="menu-header" onclick="toggleMenu('syncStatusMenu')">
+                    <div class="menu-title">
+                        <span class="menu-icon">🔄</span>
+                        <span>Sync Status</span>
+                        <span class="menu-badge success" id="syncBadge">Loading...</span>
+                    </div>
+                    <span class="expand-icon">▶</span>
+                </div>
+                <div class="menu-content">
+                    <div class="file-item" style="background: #e8f5e9; border-color: #2e7d32;">
+                        <div class="file-info">
+                            <div class="file-name">Managed Files</div>
+                            <div class="file-meta" id="managedFilesCount">Loading...</div>
+                        </div>
+                    </div>
+                    <div class="file-item" style="background: #fff3e0; border-color: #f57c00;">
+                        <div class="file-info">
+                            <a href="#" id="kaConfigLink" target="_blank" style="color: #1976d2; text-decoration: none; display: block;">
+                                <div class="file-name" style="font-size: 0.85rem; line-height: 1.4;">
+                                    📊 View detailed sync status in Knowledge Assistant →
+                                </div>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- File Management Menu Item (Collapsible) -->
+            <div class="menu-item" id="fileManagementMenu">
+                <div class="menu-header" onclick="toggleMenu('fileManagementMenu')">
+                    <div class="menu-title">
+                        <span class="menu-icon">📁</span>
+                        <span>File Management</span>
+                        <span class="menu-badge" id="fileCountBadge">0 files</span>
+                    </div>
+                    <span class="expand-icon">▶</span>
+                </div>
+                <div class="menu-content">
+                    <div class="submenu-section">
+                        <div class="submenu-title">📊 Data Tables</div>
+                        <div id="tablesContainer">
+                            <div class="empty-state">Loading...</div>
+                        </div>
+                    </div>
+                    <div class="submenu-section">
+                        <div class="submenu-title">📄 Documents</div>
+                        <div id="documentsContainer">
+                            <div class="empty-state">Loading...</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <div class="chat-header">
+            <h1>Knowledge Agent Chat</h1>
+            <button onclick="clearChat()" style="padding: 8px 16px; background: #f44336; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 14px;">
+                🗑️ New Chat
+            </button>
+        </div>
+
+        <div class="chat-messages" id="chatMessages">
+            <div class="message assistant">
+                <strong>Assistant:</strong> Hello! I'm the Canada Life Knowledge Agent. I can help you answer questions based on the uploaded documents and data tables. Upload files using the button in the sidebar, or ask me a question!
+            </div>
+        </div>
+
+        <div class="chat-input-area">
+            <div class="chat-input-container">
+                <textarea
+                    id="chatInput"
+                    class="chat-input"
+                    rows="3"
+                    placeholder="Ask a question about your documents..."
+                    onkeydown="if(event.key==='Enter' && !event.shiftKey){event.preventDefault(); sendMessage();}"
+                ></textarea>
+                <button class="send-btn" onclick="sendMessage()">Send</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let filesData = { tables: [], documents: [] };
+
+        // Load files on page load
+        loadFiles();
+
+        // File upload handler
+        document.getElementById('fileInput').addEventListener('change', async (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            const formData = new FormData();
+            formData.append('file', file);
+
+            try {
+                showError('Uploading file...', 'info');
+                const response = await fetch('/api/upload', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                if (!response.ok) {
+                    const error = await response.json();
+                    throw new Error(error.detail || 'Upload failed');
+                }
+
+                const result = await response.json();
+                showError(`✓ File "${file.name}" uploaded successfully!`, 'success');
+
+                // Reload files list
+                setTimeout(loadFiles, 1000);
+            } catch (error) {
+                showError('Upload failed: ' + error.message, 'error');
+            }
+
+            // Reset input
+            e.target.value = '';
+        });
+
+        async function loadFiles() {
+            try {
+                const response = await fetch('/api/files');
+                if (!response.ok) throw new Error('Failed to load files');
+
+                filesData = await response.json();
+                await updateSyncStatus();  // Now async
+                updateFileCount();
+                renderTables();
+                renderDocuments();
+            } catch (error) {
+                showError('Failed to load files: ' + error.message, 'error');
+            }
+        }
+
+        async function updateSyncStatus() {
+            try {
+                // Fetch simplified sync status
+                const response = await fetch('/api/sync-status');
+                if (!response.ok) throw new Error('Failed to fetch sync status');
+
+                const syncData = await response.json();
+
+                // Update main badge
+                const badge = document.getElementById('syncBadge');
+                const totalFiles = filesData.tables?.length + filesData.documents?.length || 0;
+
+                if (totalFiles > 0) {
+                    badge.textContent = `${totalFiles} files`;
+                    badge.className = 'menu-badge success';
+                } else {
+                    badge.textContent = 'No files';
+                    badge.className = 'menu-badge warning';
+                }
+
+                // Update managed files count
+                const managedCount = document.getElementById('managedFilesCount');
+                managedCount.textContent = `${totalFiles} file${totalFiles !== 1 ? 's' : ''} managed`;
+
+                // Set KA config link
+                if (syncData.config_url) {
+                    const configLink = document.getElementById('kaConfigLink');
+                    configLink.href = syncData.config_url;
+                }
+
+            } catch (error) {
+                console.error('Failed to update sync status:', error);
+                const badge = document.getElementById('syncBadge');
+                badge.textContent = 'Error';
+                badge.className = 'menu-badge warning';
+            }
+        }
+
+        function updateFileCount() {
+            const badge = document.getElementById('fileCountBadge');
+            const totalFiles = (filesData.tables?.length || 0) + (filesData.documents?.length || 0);
+            badge.textContent = `${totalFiles} file${totalFiles !== 1 ? 's' : ''}`;
+        }
+
+        function toggleMenu(menuId) {
+            const menu = document.getElementById(menuId);
+            menu.classList.toggle('expanded');
+        }
+
+        function renderTables() {
+            const container = document.getElementById('tablesContainer');
+
+            if (!filesData.tables || filesData.tables.length === 0) {
+                container.innerHTML = '<div class="empty-state">No tables yet</div>';
+                return;
+            }
+
+            container.innerHTML = filesData.tables.map(table => `
+                <div class="file-item">
+                    <div class="file-info">
+                        <div class="file-name">
+                            ${table.original_filename}
+                            <span class="badge badge-table">TABLE</span>
+                        </div>
+                        <div class="file-meta">${table.table_name}</div>
+                    </div>
+                    <button class="delete-btn" onclick="deleteTable('${table.table_name}')">Delete</button>
+                </div>
+            `).join('');
+        }
+
+        function renderDocuments() {
+            const container = document.getElementById('documentsContainer');
+
+            if (!filesData.documents || filesData.documents.length === 0) {
+                container.innerHTML = '<div class="empty-state">No documents yet</div>';
+                return;
+            }
+
+            container.innerHTML = filesData.documents.map(doc => `
+                <div class="file-item">
+                    <div class="file-info">
+                        <div class="file-name">
+                            ${doc.name}
+                            <span class="badge badge-doc">DOC</span>
+                        </div>
+                        <div class="file-meta">${formatBytes(doc.size)}</div>
+                    </div>
+                    <button class="delete-btn" onclick="deleteDocument('${doc.name}')">Delete</button>
+                </div>
+            `).join('');
+        }
+
+        async function deleteTable(tableName) {
+            if (!confirm(`Delete table "${tableName}"?\n\nThis will:\n• Drop the Delta table\n• Remove it from the Genie space\n\nThis cannot be undone.`)) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`/api/managed-files/table/${encodeURIComponent(tableName)}`, {
+                    method: 'DELETE'
+                });
+
+                if (!response.ok) {
+                    const error = await response.json();
+                    throw new Error(error.detail || 'Failed to delete table');
+                }
+
+                showError(`✓ Table "${tableName}" deleted successfully`, 'success');
+                loadFiles();
+            } catch (error) {
+                showError('Failed to delete table: ' + error.message, 'error');
+            }
+        }
+
+        async function deleteDocument(filename) {
+            if (!confirm(`Delete document "${filename}"?\n\nThis will permanently delete the file.\n\nThis cannot be undone.`)) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`/api/managed-files/document/${encodeURIComponent(filename)}`, {
+                    method: 'DELETE'
+                });
+
+                if (!response.ok) {
+                    const error = await response.json();
+                    throw new Error(error.detail || 'Failed to delete document');
+                }
+
+                showError(`✓ Document "${filename}" deleted successfully`, 'success');
+                loadFiles();
+            } catch (error) {
+                showError('Failed to delete document: ' + error.message, 'error');
+            }
+        }
+
+        function showError(message, type = 'error') {
+            const container = document.getElementById('errorContainer');
+            const className = type === 'success' ? 'success-banner' : 'error-banner';
+            container.innerHTML = `<div class="${className}">${message}</div>`;
+            setTimeout(() => container.innerHTML = '', 5000);
+        }
+
+        function formatBytes(bytes) {
+            if (bytes === 0) return '0 B';
+            const k = 1024;
+            const sizes = ['B', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return Math.round(bytes / Math.pow(k, i) * 100) / 100 + ' ' + sizes[i];
+        }
+
+        // Chat functionality
+        let conversationHistory = [];
+
+        async function sendMessage() {
+            const input = document.getElementById('chatInput');
+            const message = input.value.trim();
+            if (!message) return;
+
+            // Disable input while processing
+            input.disabled = true;
+
+            // Add user message to history and display
+            conversationHistory.push({ role: 'user', content: message });
+            addMessage('user', message);
+            input.value = '';
+
+            // Show thinking indicator
+            const thinkingId = 'thinking-indicator';
+            addThinkingIndicator(thinkingId);
+
+            // Send full conversation history to backend
+            try {
+                const response = await fetch('/api/chat', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        messages: conversationHistory,
+                        stream: false
+                    })
+                });
+
+                if (!response.ok) throw new Error('Chat request failed');
+
+                const data = await response.json();
+                const assistantResponse = data.content || 'No response';
+
+                // Remove thinking indicator
+                removeThinkingIndicator(thinkingId);
+
+                // Add assistant response to history and display
+                conversationHistory.push({ role: 'assistant', content: assistantResponse });
+                addMessage('assistant', assistantResponse);
+            } catch (error) {
+                // Remove thinking indicator on error
+                removeThinkingIndicator(thinkingId);
+
+                const errorMsg = 'Error: ' + error.message;
+                conversationHistory.push({ role: 'assistant', content: errorMsg });
+                addMessage('assistant', errorMsg);
+            } finally {
+                // Re-enable input
+                input.disabled = false;
+                input.focus();
+            }
+        }
+
+        function addThinkingIndicator(id) {
+            const messagesDiv = document.getElementById('chatMessages');
+            const thinkingDiv = document.createElement('div');
+            thinkingDiv.id = id;
+            thinkingDiv.className = 'message assistant thinking';
+            thinkingDiv.innerHTML = `
+                <strong>Assistant:</strong>
+                <span class="thinking-dots">
+                    <span class="dot">●</span>
+                    <span class="dot">●</span>
+                    <span class="dot">●</span>
+                </span>
+                <span style="color: #666; font-style: italic;"> thinking...</span>
+            `;
+            messagesDiv.appendChild(thinkingDiv);
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+        }
+
+        function removeThinkingIndicator(id) {
+            const indicator = document.getElementById(id);
+            if (indicator) {
+                indicator.remove();
+            }
+        }
+
+        function addMessage(role, content) {
+            const messagesDiv = document.getElementById('chatMessages');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${role}`;
+
+            // Format the content with proper paragraphs and spacing
+            let formattedContent;
+            try {
+                formattedContent = formatMessageContent(content);
+                console.log('[DEBUG] Formatted content length:', formattedContent.length);
+                console.log('[DEBUG] First 200 chars:', formattedContent.substring(0, 200));
+            } catch (error) {
+                console.error('[ERROR] formatMessageContent failed:', error);
+                formattedContent = content; // Fallback to raw content
+            }
+
+            messageDiv.innerHTML = `<strong>${role === 'user' ? 'You' : 'Assistant'}:</strong> ${formattedContent}`;
+            messagesDiv.appendChild(messageDiv);
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+        }
+
+        function formatMessageContent(content) {
+            console.log('[DEBUG] formatMessageContent called with length:', content.length);
+
+            if (!content || typeof content !== 'string') {
+                console.error('[ERROR] Invalid content:', typeof content);
+                return content;
+            }
+
+            try {
+                // Step 1: Convert **bold** to <strong> first
+                content = content.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+                console.log('[DEBUG] After bold conversion, length:', content.length);
+
+                // Step 2: Add paragraph breaks before key patterns
+                // Before standalone bold headings (e.g., "<strong>Key Benefits:</strong>")
+                content = content.replace(/(<strong>[^<]+<\/strong>:)/g, '\n\n$1\n');
+
+                // Before bullet points
+                content = content.replace(/([•\-])\s+(<strong>)/g, '\n$1 $2');
+
+                // Before ## headings
+                content = content.replace(/(##\s+)/g, '\n\n$1');
+
+                console.log('[DEBUG] After adding breaks, has newlines:', content.includes('\n'));
+
+                // Step 3: Build HTML structure
+                const lines = content.split('\n');
+                console.log('[DEBUG] Split into', lines.length, 'lines');
+
+                let html = '';
+                let inList = false;
+                let paragraph = '';
+
+                for (const line of lines) {
+                    const trimmed = line.trim();
+
+                    if (!trimmed) {
+                        // Empty line - close paragraph or list
+                        if (paragraph) {
+                            html += `<p>${paragraph}</p>`;
+                            paragraph = '';
+                        }
+                        if (inList) {
+                            html += '</ul>';
+                            inList = false;
+                        }
+                        continue;
+                    }
+
+                    // Bullet point
+                    if (trimmed.match(/^[•\-]\s/)) {
+                        if (paragraph) {
+                            html += `<p>${paragraph}</p>`;
+                            paragraph = '';
+                        }
+                        if (!inList) {
+                            html += '<ul>';
+                            inList = true;
+                        }
+                        html += `<li>${trimmed.replace(/^[•\-]\s+/, '')}</li>`;
+                        continue;
+                    }
+
+                    // Regular line
+                    if (inList) {
+                        html += '</ul>';
+                        inList = false;
+                    }
+
+                    if (paragraph) {
+                        paragraph += ' ' + trimmed;
+                    } else {
+                        paragraph = trimmed;
+                    }
+                }
+
+                // Close remaining
+                if (paragraph) {
+                    html += `<p>${paragraph}</p>`;
+                }
+                if (inList) {
+                    html += '</ul>';
+                }
+
+                console.log('[DEBUG] Generated HTML length:', html.length);
+                console.log('[DEBUG] Has <p> tags:', html.includes('<p>'));
+                console.log('[DEBUG] Has <ul> tags:', html.includes('<ul>'));
+
+                return html || content; // Fallback to original if empty
+            } catch (error) {
+                console.error('[ERROR] formatMessageContent exception:', error);
+                return content; // Return original on error
+            }
+        }
+
+        function clearChat() {
+            if (confirm('Clear conversation history?')) {
+                conversationHistory = [];
+                document.getElementById('chatMessages').innerHTML = '';
+            }
+        }
+    </script>
+</body>
+</html>
